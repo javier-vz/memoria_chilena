@@ -1,0 +1,10 @@
+.ipynb_checkpoints/
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
+.DS_Store
+# Las salidas se generan localmente.
+data/output/*
+!data/output/.gitkeep

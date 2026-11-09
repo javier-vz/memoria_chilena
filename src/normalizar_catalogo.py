@@ -170,7 +170,7 @@ def build(input_zip: str | Path, output_dir: str | Path) -> dict:
     for triple in enrich:
         integrated.add(triple)
 
-    raw.serialize(destination=str(output_dir/'catalogo_original_93_triples.ttl'),format='turtle')
+    raw.serialize(destination=str(output_dir/'catalogo_original.ttl'),format='turtle')
     enrich.serialize(destination=str(output_dir/'catalogo_normalizado.ttl'),format='turtle')
     integrated.serialize(destination=str(output_dir/'grafo_integrado.ttl'),format='turtle')
     _write_csv(output_dir/'documentos_normalizados.csv',records,['url','titulo','titulo_procedencia','rdf_disponible','rdf_url','creador_rdf','fecha_rdf','identificador_mcid','unidades_catalogo','temas_catalogo'])
@@ -178,7 +178,7 @@ def build(input_zip: str | Path, output_dir: str | Path) -> dict:
     _write_csv(output_dir/'conceptos_catalograficos.csv',sorted(topic_rows,key=lambda x:(x['tipo'],x['valor_original'],x['recurso'])),['recurso','tipo','valor_original','concepto_uri','evidencia'])
 
     report={
-        'fuente':'ZIP de auditoría aportado por el usuario',
+        'fuente':'ZIP de auditoría descargado en Etapa 1',
         'fecha_procesamiento_utc':datetime.now(timezone.utc).isoformat(),
         'minisitio':str(minisitio),
         'triples_rdf_originales':len(raw),
@@ -221,7 +221,7 @@ categorías y estructuras de catalogación, no necesariamente personas o eventos
 
 ## Archivos
 
-- `catalogo_original_93_triples.ttl`: RDF original intacto, serializado.
+- `catalogo_original.ttl`: RDF original intacto, serializado.
 - `catalogo_normalizado.ttl`: relaciones explícitas de catalogación y unidades temáticas.
 - `grafo_integrado.ttl`: unión de ambos sin modificar el grafo original.
 - `documentos_normalizados.csv`: inventario de las diez fichas, con estado RDF y procedencia del título.

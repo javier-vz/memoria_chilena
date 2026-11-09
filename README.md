@@ -1,112 +1,83 @@
-# Memoria Chilena — GraphRAG patrimonial
+# Memoria Chilena — GraphRAG patrimonial (auditoría 1–3)
 
-**Etapas 1 y 2: auditoría de un minisitio y normalización del catálogo RDF.**
+Proyecto Jupyter/Python para comenzar **desde cero** el piloto de metadatos RDF de [Memoria Chilena](https://www.memoriachilena.gob.cl/602/w3-article-790.html). No incluye resultados de ejecuciones previas: **todo se recupera de nuevo** en el ordenador donde se ejecuta.
 
-Este repositorio de investigación nace de la experiencia de GraphRAG de Qoyllur Rit'i. **Por ahora NO es un RAG funcional:** solo recoge y normaliza metadatos y relaciones editoriales verificables. El material de entrada es una auditoría real del minisitio [La religiosidad andina](https://www.memoriachilena.gob.cl/602/w3-article-790.html), ejecutada el 9 de noviembre de 2026.
+## Inicio: un solo notebook
 
-## Resultados de la auditoría aportada
+1. Descomprimir `MC_GraphRAG_DESDE_CERO_JUPYTER.zip` en una carpeta propia, por ejemplo `C:\Users\...\Documents\memoria_chilena`.
+2. En Windows, hacer doble clic en **`INICIAR_JUPYTER.bat`** (instala las dependencias y abre JupyterLab). En macOS/Linux, abrir terminal en la carpeta del proyecto y ejecutar `python -m pip install -r requirements.txt` seguido de `jupyter lab`.
+3. Abrir **`ABRIR_AQUI.ipynb`** y pulsar **Run → Run All Cells**.
+4. El notebook ejecuta las etapas 1, 2 y 3, y genera todos los ZIP automáticamente.
 
-| Métrica | Resultado |
-|---|---:|
-| RDF parseados | 3 (minisitio y dos documentos) |
-| Triples RDF originales | 93 |
-| Predicados RDF distintos | 25 |
-| Sujetos URI propios | 3 |
-| Nodos anónimos RDF | 23 |
-| Fichas documentales enlazadas desde HTML | 10 |
-| Fichas con RDF en esta auditoría | 2 |
-| Fichas sin RDF todavía | 8 |
+> Si vas a **reemplazar** un proyecto anterior, haz antes una copia de cualquier resultado que quieras conservar. Puedes borrar la carpeta anterior y sustituirla por esta nueva estructura. No hay que copiar `etapa2.zip`, `memoria_chilena_auditoria.zip` ni preparar `data/input`.
 
-**Advertencia:** los enlaces entre páginas no prueban relaciones históricas. El pipeline modela *listado en el catálogo*, *pertenencia a unidad temática* y *materia catalográfica*, nunca vínculos de causalidad o participación histórica.
-
-## Estructura
+### Los ZIP se crean solos en `data/output/`
 
 ```text
-memoria-chilena-etapa2/
+memoria_chilena/
+├── ABRIR_AQUI.ipynb       ← abrir este único notebook
+├── INICIAR_JUPYTER.bat   ← Windows: doble clic para abrir Jupyter
 ├── README.md
 ├── requirements.txt
-├── .gitignore
-├── notebooks/
-│   ├── 01_auditoria_memoria_chilena.ipynb
-│   └── 02_normalizacion_catalogo.ipynb
+├── ejecutar_todo.py       ← opción sin Jupyter
 ├── src/
-│   └── normalizar_catalogo.py
+│   ├── auditoria.py       ← etapa 1: HTML + RDF/XML
+│   ├── normalizar_catalogo.py  ← etapa 2: grafo normalizado
+│   ├── mc_etapa3.py       ← etapa 3: RDF de documentos pendientes
+│   └── pipeline.py        ← encadena etapas + crea ZIP
 ├── tests/
-│   └── test_etapa2.py
 └── data/
-    ├── input/
-    │   └── memoria_chilena_auditoria.zip
     └── output/
-        └── .gitkeep
+        ├── etapa1/                         ← se crea al ejecutar
+        ├── etapa1.zip                      ← automático
+        ├── etapa2/                         ← se crea al ejecutar
+        ├── etapa2.zip                      ← automático
+        ├── etapa3/                         ← se crea al ejecutar
+        ├── etapa3.zip                      ← automático
+        ├── RESUMEN_PIPELINE.json
+        └── MEMORIA_CHILENA_RESULTADOS.zip  ← compartir este
 ```
 
-El ZIP incluido en `data/input` es el resultado que se generó en la etapa 1. No contiene libros digitalizados ni OCR.
+### Alternativa sin notebook
 
-## Ejecutar con Jupyter local
-
-Requiere Python 3.10 o superior.
-
-En **Windows PowerShell** (ubicado dentro de la carpeta extraída):
+Desde la raíz del proyecto:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-jupyter lab
+python ejecutar_todo.py
 ```
 
-En **macOS/Linux**:
+## Qué hace
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-jupyter lab
-```
+- **Etapa 1:** consulta un minisitio y dos fichas semilla; reconoce los enlaces de su sección *Documentos*, descarga los RDF asociados y exporta un informe CSV/JSON/Turtle y `etapa1.zip`.
+- **Etapa 2:** lee **automáticamente `etapa1.zip`**; crea relaciones de catalogación con procedencia, no hechos históricos, y genera `etapa2.zip`.
+- **Etapa 3:** lee **automáticamente `etapa2.zip`**; visita las fichas documentales, recupera RDF que falte, registra derechos y enlaces de descarga **sin bajar libros ni PDF**; genera `etapa3.zip`.
+- **Entrega:** comprime los tres ZIP y un resumen en `MEMORIA_CHILENA_RESULTADOS.zip`.
 
-En la interfaz, abre `notebooks/02_normalizacion_catalogo.ipynb` y selecciona **Run All Cells**. El notebook localiza automáticamente la raíz del proyecto tanto si arrancaste Jupyter desde la raíz como desde `notebooks/`.
+Los resultados dependen del estado actual del portal, la conexión y de las respuestas RDF. No se fuerzan números como “93 triples” o “221 triples”. Si hay un error de red o cambios HTML se reportan; se conserva la salida disponible sin inventar datos. Si el minisitio no proporciona ningún enlace documental, la ejecución se detiene después de guardar `etapa1.zip` y un mensaje de error, en vez de fabricar un grafo.
 
-No necesita internet. Los resultados aparecen en `data/output/etapa2/` y se pueden descargar desde Jupyter como ZIP.
+## Reejecución y repositorio GitHub
 
-## Alternativa sin notebook
+**Run All Cells** vuelve a consultar la fuente y **reemplaza** los resultados de las carpetas `data/output/etapa1`, `etapa2` y `etapa3` y sus ZIP. Se recomienda no colocar archivos propios dentro de esas carpetas. Los resultados están excluidos de Git mediante `.gitignore` por prudencia respecto de datos descargados. Puedes versionar el código, el README y los tests.
 
-Desde la carpeta raíz:
+Para comprobar que el código funciona sin internet:
 
-```bash
-python src/normalizar_catalogo.py --input data/input/memoria_chilena_auditoria.zip --output data/output/etapa2
+```powershell
+python -m pip install pytest
 python -m pytest -q
 ```
 
-## Archivos de salida
+## Ética documental y límites del piloto
 
-- `catalogo_original_93_triples.ttl`: copia reserializada del RDF de entrada, manteniendo la semántica original.
-- `catalogo_normalizado.ttl`: tipos de recursos, listados documentales y etiquetas normalizadas.
-- `grafo_integrado.ttl`: unión del grafo original con la capa de normalización.
-- `documentos_normalizados.csv`: diez fichas, título y procedencia, disponibilidad de RDF, creador, fecha e identificadores cuando hay evidencia.
-- `enlaces_catalograficos.csv`: la evidencia de enlaces HTML del minisitio a documentos.
-- `conceptos_catalograficos.csv`: unidades temáticas y materias de catálogo.
-- `informe_etapa2.json` y `INFORME_ETAPA2.md`: auditoría cuantitativa y limitaciones.
+- El programa aplica pausa de al menos **2,5 segundos** entre solicitudes al mismo servidor, consulta `robots.txt`, utiliza una lista pequeña de fichas y limita el tamaño de respuesta.
+- Si el portal cambia los permisos o bloquea las solicitudes, no se intenta eludir esas restricciones.
+- Los enlaces de la sección Documentos indican **inclusión editorial**, no causalidad ni influencia histórica.
+- La normalización introduce un vocabulario local `urn:mcgraphrag:`; el RDF original se conserva por separado.
+- En etapa 3 se registran enlaces y etiquetas de derechos, pero no se descargan publicaciones completas, ni se realiza OCR o generación de respuestas. **Este proyecto es todavía una auditoría documental previa al RAG.**
+- Antes de compartir objetos digitales o sus transcripciones, verificar las condiciones específicas de uso de cada ficha.
 
-## Vocabulario añadido
+## Primer caso
 
-Se reutilizan los **URI originales de Memoria Chilena** para sus páginas. Los identificadores que creamos localmente comienzan con `urn:mcgraphrag:`; son identificadores del proyecto, no identificadores oficiales de la Biblioteca Nacional.
+Minisitio *La religiosidad andina*: https://www.memoriachilena.gob.cl/602/w3-article-790.html
 
-| Propiedad | Significado verificado |
-|---|---|
-| `mcg:hasListedDocument` | El HTML del minisitio lista una ficha documental |
-| `mcg:inCatalogUnit` | La ficha pertenece a una unidad temática indicada por `mc:ut` |
-| `mcg:hasCatalogSubject` | La ficha incluye una materia de `mc:tema` |
-| `prov:wasDerivedFrom` | Identifica la página HTML de la que procede el listado |
-| `mcg:hasRdfMetadataSource` | Dirección RDF asociada a la ficha |
-
-La capa original RDF se mantiene separada de la capa derivada para facilitar la auditoría. Las cadenas de las unidades temáticas se conservan tal como aparecen, sin inventar títulos legibles.
-
-## Próxima etapa: ampliar RDF y obtener texto verificable
-
-1. Descargar responsablemente los RDF de las otras ocho fichas, mediante consultas espaciadas y respetando las condiciones del portal.
-2. Verificar por documento el acceso a texto, OCR o imágenes, además de derechos de uso.
-3. Crear *chunks* con `documento`, `página`, `fragmento`, `fuente` y `método de extracción`.
-4. Implementar un baseline BM25/FAISS y luego GraphRAG con expansión catalográfica explícita.
-5. Evaluar con preguntas históricas contrastadas y citas a documentos, sin confundir fuentes primarias con textos curatoriales.
-
-**Derechos:** los metadatos y las reproducciones digitalizadas pueden tener condiciones diferentes. Este repositorio no redistribuye objetos digitales ni presupone una licencia para ellos; verificar cada ficha antes de añadir materiales.
+Repositorio previsto: `memoria-chilena-graphrag` (no se publica automáticamente en GitHub).

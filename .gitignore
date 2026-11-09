@@ -1,9 +1,12 @@
-# Datos descargados en ejecución, no publicar sin comprobar derechos.
+# Artefactos Jupyter / Python
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+# Datos descargados o generados (no publicarlos por defecto)
+data/input/*
+!data/input/.gitkeep
 data/output/*
 !data/output/.gitkeep
-__pycache__/
-.pytest_cache/
-.ipynb_checkpoints/
-.venv/
-.env
-*.pyc

@@ -1,5 +1,5 @@
+jupyterlab>=4.0,<5
+ipykernel>=6.0,<8
 requests>=2.31,<3
 beautifulsoup4>=4.12,<5
-rdflib>=7.0,<8
-jupyterlab>=4,<5
-ipython>=8
+rdflib>=7.0,<9

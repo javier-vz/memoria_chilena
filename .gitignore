@@ -1,12 +1,9 @@
-# Artefactos Jupyter / Python
-.ipynb_checkpoints/
-__pycache__/
-*.pyc
-.venv/
-venv/
-.env
-# Datos descargados o generados (no publicarlos por defecto)
-data/input/*
-!data/input/.gitkeep
+data/input/*.zip
 data/output/*
 !data/output/.gitkeep
+data/pdf/*
+!data/pdf/.gitkeep
+data/cache/*
+.ipynb_checkpoints/
+__pycache__/
+.venv/
